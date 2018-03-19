@@ -41,3 +41,12 @@ left join øvelseigruppe on øvelsegruppe.id = øvelseigruppe.gruppeid
 left join øvelse on øvelse.id = øvelseigruppe.øvelseid
 
 where øvelsegruppe.navn = ?
+
+Finne gjennomsnitt:
+select avg(kilo) from øvelse
+
+left join treningsøktutførerøvelse on treningsøktutførerøvelse.øvelseID = øvelse.id
+
+left join treningsøkt on treningsøktutførerøvelse.treningsøktid = treningsøkt.id
+
+where dato > ? and dato < ?
