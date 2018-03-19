@@ -29,3 +29,15 @@ left join treningsøktutførerøvelse on treningsøkt.id = treningsøktutførerøvelse.
 
 left join øvelse on treningsøktutførerøvelse.øvelseID = øvelse.id
 where navn = ? and dato > ? and dato < ?
+
+Lage øvelsegrupper:
+insert into øvelsegruppe(navn) values (?)
+
+Finne øvelser i samme gruppe
+select øvelse.navn from øvelsegruppe
+
+left join øvelseigruppe on øvelsegruppe.id = øvelseigruppe.gruppeid
+
+left join øvelse on øvelse.id = øvelseigruppe.øvelseid
+
+where øvelsegruppe.navn = ?
