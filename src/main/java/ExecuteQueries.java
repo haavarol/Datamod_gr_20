@@ -29,4 +29,12 @@ public class ExecuteQueries extends DBConnect{
     public void insertØvelse() {
         
     }
+
+    public void insertNotat(String treningsformål, String treningsopplevelse, int treningsøktID) throws SQLException {
+        connect();
+        PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO notat(treningsformål, treningsopplevelse, treningsøktID) VALUES (?,?,?) ");
+        preparedStatement.setString(1,treningsformål);
+        preparedStatement.setString(2, treningsopplevelse);
+        preparedStatement.setInt(3,treningsøktID);
+    }
 }
