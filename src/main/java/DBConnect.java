@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
 
 public abstract class DBConnect {
@@ -11,12 +12,23 @@ public abstract class DBConnect {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             // Properties for user and password. Here the user and password are both 'paulr'
             Properties p = new Properties();
-            p.put("user", "myuser");
-            p.put("password", "mypassword");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project?autoReconnect=true&useSSL=false",p);
+
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project","root", "1234");
         } catch (Exception e)
         {
             throw new RuntimeException("Unable to connect", e);
         }
     }
+
+    public void disconnect() {
+        if (conn != null) {
+            try {
+                conn.close();
+                conn = null;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
