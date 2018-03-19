@@ -1,0 +1,52 @@
+Registrer apparat:
+insert into apparat (navn, bruksanvisning) values(?, ?)
+
+Registrere øvelser med apparat:
+insert into øvelse (navn, kilo, sett, type) values (?, ?, ?, "apparat")
+MÅ OGSÅ KNYTTES TIL APPARAT
+
+Registrere øvelser uten apparat:
+insert into øvelse (navn, beskrivelse, type) values (?, ?, "fri")
+
+Registrere treningsøkt
+insert into treningsøkt (dato, tidspunkt, varighet, informasjon, personlig_form, prestasjon)
+
+values (?, ?, ?, ?, ?, ?)
+MÅ OGSÅ HA MULIGHET FOR NOTAT
+MÅ KNYTTES TIL UTFØRT ØVELSE
+
+Få info om n siste treningsøkter med notat:
+select dato, tidspunkt, varighet, informasjon, personlig_form, treningsformål, treningsopplevelse from treningsøkt
+left
+join notat on treningsøkt.id = notat.treningsøktID
+
+order by dato desc, tidspunkt desc limit ?
+
+Se en øvelses resultatlog i et tidsinterval:
+select informasjon from treningsøkt
+
+left join treningsøktutførerøvelse on treningsøkt.id = treningsøktutførerøvelse.treningsøktID
+
+left join øvelse on treningsøktutførerøvelse.øvelseID = øvelse.id
+where navn = ? and dato > ? and dato < ?
+
+Lage øvelsegrupper:
+insert into øvelsegruppe(navn) values (?)
+
+Finne øvelser i samme gruppe
+select øvelse.navn from øvelsegruppe
+
+left join øvelseigruppe on øvelsegruppe.id = øvelseigruppe.gruppeid
+
+left join øvelse on øvelse.id = øvelseigruppe.øvelseid
+
+where øvelsegruppe.navn = ?
+
+Finne gjennomsnitt:
+select avg(kilo) from øvelse
+
+left join treningsøktutførerøvelse on treningsøktutførerøvelse.øvelseID = øvelse.id
+
+left join treningsøkt on treningsøktutførerøvelse.treningsøktid = treningsøkt.id
+
+where dato > ? and dato < ?
