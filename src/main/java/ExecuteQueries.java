@@ -26,8 +26,17 @@ public class ExecuteQueries extends DBConnect{
 
     }
 
-    public void insertØvelse() {
-        
+    public void insertØvelse(String navn, String kilo, String sett, String beskrivelse, String type) throws SQLException {
+        connect();
+        PreparedStatement statement1 = conn.prepareStatement("INSERT into øvelse(navn, kilo, sett, beskrivelse, type) values (?,?,?,?,?)");
+        statement1.setString(1, navn);
+        statement1.setString(2, kilo);
+        statement1.setString(3, sett);
+        statement1.setString(4, beskrivelse);
+        statement1.setString(5, type);
+        statement1.executeUpdate();
+        disconnect();
+
     }
 
     public void insertNotat(String treningsformål, String treningsopplevelse, int treningsøktID) throws SQLException {
