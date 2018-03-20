@@ -31,12 +31,21 @@ public class ExecuteQueries extends DBConnect{
         disconnect();
     }
 
+    public void insertTreningMedNotat(int varighet, String informasjon, int personlig_form, int prestasjon, String treningsformål, String treningsopplevelse) throws SQLException{
+        connect();
+        insertTreningsøkt(varighet,informasjon,personlig_form,prestasjon);
+        ResultSet allTreningsøkt = conn.createStatement().executeQuery("SELECT FIRST from treningsøkt ORDER BY ??????????? DESC");
+        //Skaff treningsøktID fra ResultSet
+        int treningsØktID = 1;
+        insertNotat(treningsformål,treningsopplevelse, treningsØktID);
+    }
+
     public void insertFriØvelse(String navn, String beskrivelse, String type) throws SQLException {
         connect();
         PreparedStatement statement1 = conn.prepareStatement("INSERT into øvelse(navn, beskrivelse, type) values (?,?,?)");
         statement1.setString(1, navn);
         statement1.setString(2, beskrivelse);
-        statement1.setString(3, type);
+        statement1.setString(3, "fri");
         statement1.executeUpdate();
         System.out.println("insert into øvelse values "+navn+", "+beskrivelse+", "+type);
         disconnect();
@@ -48,7 +57,7 @@ public class ExecuteQueries extends DBConnect{
         statement1.setString(1, navn);
         statement1.setInt(2, kilo);
         statement1.setInt(3, sett);
-        statement1.setString(4, type);
+        statement1.setString(4, "apparat");
         statement1.executeUpdate();
         System.out.println("insert into øvelse values "+navn+", "+kilo+", "+sett+", "+type);
         disconnect();
@@ -64,17 +73,48 @@ public class ExecuteQueries extends DBConnect{
         System.out.println("insert into notat(treningsformål, treningsopplevelse, treningsøktID) VALUES "+treningsformål+", "+treningsopplevelse+", "+treningsøktID);
     }
 
+    public void insertøvelseGrupper(String navn) throws SQLException {
+        connect();
+        PreparedStatement preparedStatement = conn.prepareStatement("insert into øvelsegruppe(navn) values ?");
+        preparedStatement.setString(1,navn);
+        preparedStatement.executeUpdate();
+    }
+
     /**
      *  GETTERS
      */
 
-    public ResultSet getAllApparat() {
+    public ResultSet getAllApparat() throws SQLException {
+        ResultSet rs = Select("SELECT * from apparat");
+        return rs;
+    }
+
+    public ResultSet getNLastTreningsØkterMedNotat() throws SQLException {
+        ResultSet rs = Select("select dato, tidspunkt, varighet, informasjon, personlig_form, treningsformål, treningsopplevelse from treningsøkt left join notat on treningsøkt.id = notat.treningsøktID order by dato desc, tidspunkt desc limit ?");
+        return rs;
+    }
+
+    public ResultSet øvelseResultatLogIInterval() throws SQLException {
+        ResultSet rs = Select("select informasjon from treningsøkt left join treningsøktutførerøvelse on treningsøkt.id = treningsøktutførerøvelse.treningsøktID left join øvelse on treningsøktutførerøvelse.øvelseID = øvelse.id where navn = ? and dato > ? and dato < ?");
+        return rs;
+    }
+
+    public ResultSet finneØvelserISammeGruppe() throws SQLException {
+        ResultSet rs = Select("select øvelse.navn from øvelsegruppe left join øvelseigruppe on øvelsegruppe.id = øvelseigruppe.gruppeid left join øvelse on øvelse.id = øvelseigruppe.øvelseid where øvelsegruppe.navn = ?");
+        return rs;
+    }
+
+    public ResultSet finneGjennomsnitt() throws SQLException{
+        ResultSet rs = Select("select avg(kilo) from øvelse left join treningsøktutførerøvelse on treningsøktutførerøvelse.øvelseID = øvelse.id left join treningsøkt on treningsøktutførerøvelse.treningsøktid = treningsøkt.id where dato > ? and dato < ?");
+        return rs;
+    }
+
+    public ResultSet Select(String Select) throws SQLException {
         connect();
         ResultSet rs = null;
         try {
-            rs = conn.createStatement().executeQuery("SELECT * from apparat");
-
-        } catch (SQLException e) {
+            rs = conn.createStatement().executeQuery(Select);
+        } catch (SQLException e){
             e.printStackTrace();
         }
         if(rs != null) {
