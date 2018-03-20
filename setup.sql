@@ -1,9 +1,9 @@
+DROP DATABASE IF exists project;
 CREATE DATABASE project;
 USE project;
 
 CREATE TABLE treningsøkt(ID INT NOT NULL AUTO_INCREMENT,
-  dato DATE,
-  tidspunkt TIME,
+  timestamp TIMESTAMP DEFAULT current_timestamp,
   varighet INT,
   informasjon VARCHAR(100),
   personlig_form INT,
