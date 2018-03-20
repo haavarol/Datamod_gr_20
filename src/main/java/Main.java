@@ -1,11 +1,50 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String args[]) throws SQLException {
-        Scanner scanner = new Scanner(System.in);
+        String command = args[0];
+        ExecuteQueries eq = new ExecuteQueries();
+        if (command.equals("avg")){
+            String start = args[1];
+            String slutt = args[2];
+            ArrayList<String> result = eq.getGjennomsnitt(start, slutt);
+            System.out.println(result);
+        }
+        else if(command.equals("hentØvelseISammeGruppe")){
+            String navn = args[1];
+            ArrayList<String> result = eq.getØvelserISammeGruppe(navn);
+                System.out.println(result);
+        }
+        else if(command.equals("skapØvelseGruppe")){
+            String navn = args[1];
+            eq.insertØvelsegruppe(navn);
+        }
+        else if(command.equals("hentØvelseISammeGruppe")){
+            String navn = args[1];
+            ArrayList<String> result = eq.getØvelserISammeGruppe(navn);
+            System.out.println(result);
+        }
+        else if(command.equals("hentResultatlogForØvelse")){
+            String øvelse = args[1];
+            String start = args[2];
+            String slutt = args[3];
+            ArrayList<String> result = eq.getResultatlogMedInterval(øvelse, start, slutt);
+            System.out.println(result);
+        }
+        else if(command.equals("hentNSiste")){
+            String n = args[1];
+            ArrayList<String> result = eq.getLastNtreningsøkt(n);
+            System.out.println(result);
+        }
+        else{
+            System.out.println("Invalid command");
+        }
+
+        /*Scanner scanner = new Scanner(System.in);
         ExecuteQueries a = new ExecuteQueries();
         ResultSet rs = null;
 
@@ -30,6 +69,6 @@ public class Main {
                 System.out.print(", navn: " + first);
                 System.out.println(", bruksanvisning: " + last);
             }
-        }
+        }*/
     }
 }

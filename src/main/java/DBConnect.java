@@ -13,7 +13,7 @@ public abstract class DBConnect {
             // Properties for user and password. Here the user and password are both 'paulr'
             Properties p = new Properties();
 
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project","root", "1234");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project","root", "root");
         } catch (Exception e)
         {
             throw new RuntimeException("Unable to connect", e);
