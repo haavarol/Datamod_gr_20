@@ -34,10 +34,12 @@ public class ExecuteQueries extends DBConnect{
     public void insertTreningMedNotat(int varighet, String informasjon, int personlig_form, int prestasjon, String treningsformål, String treningsopplevelse) throws SQLException{
         connect();
         insertTreningsøkt(varighet,informasjon,personlig_form,prestasjon);
-        ResultSet allTreningsøkt = conn.createStatement().executeQuery("SELECT FIRST from treningsøkt ORDER BY ??????????? DESC");
-        //Skaff treningsøktID fra ResultSet
-        int treningsØktID = 1;
-        insertNotat(treningsformål,treningsopplevelse, treningsØktID);
+        ResultSet allTreningsøkt = conn.createStatement().executeQuery("SELECT FIRST from treningsøkt ORDER BY id DESC");
+        int id = 1;
+        while (allTreningsøkt.next()) {
+            id = allTreningsøkt.getInt("id");
+        }
+        insertNotat(treningsformål,treningsopplevelse, id);
     }
 
     public void insertFriØvelse(String navn, String beskrivelse, String type) throws SQLException {
