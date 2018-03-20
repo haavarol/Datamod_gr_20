@@ -10,25 +10,82 @@ public class Main {
         ResultSet rs = null;
 
         //a.insertApparat("BeinløfteMaskin", "Løftbeinet");
-
+        String choice;
         // UI
-        System.out.println("Available commands:\n insertApparat");
-        if(scanner.next().equals("insertApparat")){
-            System.out.println("Navn: ");
-            String navn = scanner.next();
-            System.out.println("Bruksanvisning: ");
-            String bruksanvisning = scanner.next();
-            a.insertApparat(navn, bruksanvisning);
-            rs = a.showAllApparat();
-            while(rs.next()) {
-                int id  = rs.getInt("id");
-                String first = rs.getString("navn");
-                String last = rs.getString("bruksanvisning");
+        System.out.println("Available commands:\ninsertApparat, insertTreningsøkt, insertØvelse, insertNotat");
+        while(true) {
+            choice = scanner.next();
 
-                //Display values
-                System.out.print("ID: " + id);
-                System.out.print(", navn: " + first);
-                System.out.println(", bruksanvisning: " + last);
+            /**
+             * InsertApparat
+             */
+            if (choice.equals("insertApparat")) {
+                System.out.print("Navn: ");
+                String navn = scanner.next();
+                System.out.print("tall: ");
+                int test1 = scanner.nextInt();
+                System.out.print("Bruksanvisning: ");
+                String bruksanvisning = scanner.next();
+                a.insertApparat(navn, bruksanvisning);
+                rs = a.getAllApparat();
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    String first = rs.getString("navn");
+                    String last = rs.getString("bruksanvisning");
+
+                    //Display values
+                    System.out.print("ID: " + id);
+                    System.out.print(", navn: " + first);
+                    System.out.println(", bruksanvisning: " + last);
+                }
+            }
+            /**
+             *  InsertTreningsøkt
+             */
+            if(choice.equals("insertTreningsøkt")) {
+                System.out.print("Varighet: ");
+                int varighet = scanner.nextInt();scanner.nextLine();
+                System.out.print("Informasjon: ");
+                String informasjon = scanner.next();scanner.nextLine();
+                System.out.print("Personlig form: ");
+                int form = scanner.nextInt();
+                System.out.print("Prestasjon: ");
+                int prestasjon = scanner.nextInt();scanner.nextLine();
+                a.insertTreningsøkt(varighet, informasjon, form, prestasjon);
+            }
+            /**
+             *  InsertØvelse
+             */
+            if(choice.equals("insertØvelse")) {
+                System.out.print("Navn: ");
+                String navn = scanner.next();
+                System.out.print("Type(fastmontert eller fri): ");
+                String type = scanner.next();
+                if(type.equals("fri")) {
+                    System.out.print("Beskrivelse: ");
+                    String beskrivelse= scanner.next();
+                    a.insertFriØvelse(navn,beskrivelse,type);
+                }
+                else {
+                    type = "fast";
+                    System.out.print("Kilo: ");
+                    int kilo = scanner.nextInt();scanner.nextLine();
+                    System.out.print("Sett: ");
+                    int sett = scanner.nextInt();scanner.nextLine();
+                    a.insertFastØvelse(navn,kilo,sett,type);
+                }
+            }
+            /**
+             *  InsertNotat
+             */
+            if(choice.equals("insertNotat")) {
+                System.out.print("Treningsformål: ");
+                String treningsformål = scanner.next();
+                System.out.print("Treningsopplevelse: ");
+                String treningsopplevelse = scanner.next();
+                System.out.print("TreningsøktID: ");
+                int id = scanner.nextInt();scanner.nextLine();
+                a.insertNotat(treningsformål,treningsopplevelse,id);
             }
         }
     }

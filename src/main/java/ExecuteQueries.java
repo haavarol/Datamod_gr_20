@@ -4,6 +4,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ExecuteQueries extends DBConnect{
+
+    /**
+     *  INSERTS
+     */
+
     public void insertApparat(String navn, String bruksanvisning) throws SQLException {
         connect();
         PreparedStatement statement1 = conn.prepareStatement("insert into apparat(navn, bruksanvisning) values (?, ?)");
@@ -14,7 +19,56 @@ public class ExecuteQueries extends DBConnect{
         disconnect();
     }
 
-    public ResultSet showAllApparat() {
+    public void insertTreningsøkt(int varighet, String informasjon, int personlig_form, int prestasjon) throws SQLException {
+        connect();
+        PreparedStatement statement1 = conn.prepareStatement("INSERT into treningsøkt(varighet, informasjon, personlig_form, prestasjon) VALUES (?,?,?,?) ");
+        statement1.setInt(1, varighet);
+        statement1.setString(2,informasjon);
+        statement1.setInt(3,personlig_form);
+        statement1.setInt(4,prestasjon);
+        statement1.executeUpdate();
+        System.out.println("insert into treningsøkt values "+varighet+", "+informasjon+", "+personlig_form+", "+prestasjon);
+        disconnect();
+    }
+
+    public void insertFriØvelse(String navn, String beskrivelse, String type) throws SQLException {
+        connect();
+        PreparedStatement statement1 = conn.prepareStatement("INSERT into øvelse(navn, beskrivelse, type) values (?,?,?)");
+        statement1.setString(1, navn);
+        statement1.setString(2, beskrivelse);
+        statement1.setString(3, type);
+        statement1.executeUpdate();
+        System.out.println("insert into øvelse values "+navn+", "+beskrivelse+", "+type);
+        disconnect();
+    }
+
+    public void insertFastØvelse(String navn, int kilo, int sett, String type) throws SQLException {
+        connect();
+        PreparedStatement statement1 = conn.prepareStatement("INSERT into øvelse(navn, kilo, sett, type) values (?,?,?,?)");
+        statement1.setString(1, navn);
+        statement1.setInt(2, kilo);
+        statement1.setInt(3, sett);
+        statement1.setString(4, type);
+        statement1.executeUpdate();
+        System.out.println("insert into øvelse values "+navn+", "+kilo+", "+sett+", "+type);
+        disconnect();
+    }
+
+    public void insertNotat(String treningsformål, String treningsopplevelse, int treningsøktID) throws SQLException {
+        connect();
+        PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO notat(treningsformål, treningsopplevelse, treningsøktID) VALUES (?,?,?) ");
+        preparedStatement.setString(1,treningsformål);
+        preparedStatement.setString(2, treningsopplevelse);
+        preparedStatement.setInt(3,treningsøktID);
+        preparedStatement.executeUpdate();
+        System.out.println("insert into notat(treningsformål, treningsopplevelse, treningsøktID) VALUES "+treningsformål+", "+treningsopplevelse+", "+treningsøktID);
+    }
+
+    /**
+     *  GETTERS
+     */
+
+    public ResultSet getAllApparat() {
         connect();
         ResultSet rs = null;
         try {
@@ -29,38 +83,5 @@ public class ExecuteQueries extends DBConnect{
         return null;
     }
 
-    public void insertTreningsøkt(String dato, String tidspunkt, String varighet, String informasjon, String personlig_form, String prestasjon) throws SQLException {
-        connect();
-        PreparedStatement statement1 = conn.prepareStatement("INSERT into treningsøkt(dato, tidspunkt, varighet, informasjon, personlig_form, prestasjon) VALUES (?,?,?,?,?,?,?) ");
-        statement1.setString(1, dato);
-        statement1.setString(2, tidspunkt);
-        statement1.setString(3, varighet);
-        statement1.setString(4,informasjon);
-        statement1.setString(5,personlig_form);
-        statement1.setString(6,prestasjon);
-        statement1.executeUpdate();
-        disconnect();
 
-    }
-
-    public void insertØvelse(String navn, String kilo, String sett, String beskrivelse, String type) throws SQLException {
-        connect();
-        PreparedStatement statement1 = conn.prepareStatement("INSERT into øvelse(navn, kilo, sett, beskrivelse, type) values (?,?,?,?,?)");
-        statement1.setString(1, navn);
-        statement1.setString(2, kilo);
-        statement1.setString(3, sett);
-        statement1.setString(4, beskrivelse);
-        statement1.setString(5, type);
-        statement1.executeUpdate();
-        disconnect();
-
-    }
-
-    public void insertNotat(String treningsformål, String treningsopplevelse, int treningsøktID) throws SQLException {
-        connect();
-        PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO notat(treningsformål, treningsopplevelse, treningsøktID) VALUES (?,?,?) ");
-        preparedStatement.setString(1,treningsformål);
-        preparedStatement.setString(2, treningsopplevelse);
-        preparedStatement.setInt(3,treningsøktID);
-    }
 }
