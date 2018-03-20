@@ -5,6 +5,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ExecuteQueries extends DBConnect{
+
+    /**
+     *  INSERTS
+     */
+
     public void insertApparat(String navn, String bruksanvisning) throws SQLException {
         connect();
         PreparedStatement statement1 = conn.prepareStatement("insert into apparat(navn, bruksanvisning) values (?, ?)");
@@ -15,46 +20,50 @@ public class ExecuteQueries extends DBConnect{
         disconnect();
     }
 
-    public ResultSet showAllApparat() {
+    public void insertTreningsøkt(int varighet, String informasjon, int personlig_form, int prestasjon) throws SQLException {
         connect();
-        ResultSet rs = null;
-        try {
-            rs = conn.createStatement().executeQuery("SELECT * from apparat");
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        if(rs != null) {
-            return rs;
-        }
-        return null;
-    }
-
-    public void insertTreningsøkt(String dato, String tidspunkt, String varighet, String informasjon, String personlig_form, String prestasjon) throws SQLException {
-        connect();
-        PreparedStatement statement1 = conn.prepareStatement("INSERT into treningsøkt(dato, tidspunkt, varighet, informasjon, personlig_form, prestasjon) VALUES (?,?,?,?,?,?,?) ");
-        statement1.setString(1, dato);
-        statement1.setString(2, tidspunkt);
-        statement1.setString(3, varighet);
-        statement1.setString(4,informasjon);
-        statement1.setString(5,personlig_form);
-        statement1.setString(6,prestasjon);
+        PreparedStatement statement1 = conn.prepareStatement("INSERT into treningsøkt(varighet, informasjon, personlig_form, prestasjon) VALUES (?,?,?,?) ");
+        statement1.setInt(1, varighet);
+        statement1.setString(2,informasjon);
+        statement1.setInt(3,personlig_form);
+        statement1.setInt(4,prestasjon);
         statement1.executeUpdate();
+        System.out.println("insert into treningsøkt values "+varighet+", "+informasjon+", "+personlig_form+", "+prestasjon);
         disconnect();
-
     }
 
-    public void insertØvelse(String navn, String kilo, String sett, String beskrivelse, String type) throws SQLException {
+    public void insertTreningMedNotat(int varighet, String informasjon, int personlig_form, int prestasjon, String treningsformål, String treningsopplevelse) throws SQLException{
         connect();
-        PreparedStatement statement1 = conn.prepareStatement("INSERT into øvelse(navn, kilo, sett, beskrivelse, type) values (?,?,?,?,?)");
+        insertTreningsøkt(varighet,informasjon,personlig_form,prestasjon);
+        ResultSet allTreningsøkt = conn.createStatement().executeQuery("SELECT FIRST from treningsøkt ORDER BY id DESC");
+        int id = 1;
+        while (allTreningsøkt.next()) {
+            id = allTreningsøkt.getInt("id");
+        }
+        insertNotat(treningsformål,treningsopplevelse, id);
+    }
+
+    public void insertFriØvelse(String navn, String beskrivelse, String type) throws SQLException {
+        connect();
+        PreparedStatement statement1 = conn.prepareStatement("INSERT into øvelse(navn, beskrivelse, type) values (?,?,?)");
         statement1.setString(1, navn);
-        statement1.setString(2, kilo);
-        statement1.setString(3, sett);
-        statement1.setString(4, beskrivelse);
-        statement1.setString(5, type);
+        statement1.setString(2, beskrivelse);
+        statement1.setString(3, "fri");
         statement1.executeUpdate();
+        System.out.println("insert into øvelse values "+navn+", "+beskrivelse+", "+type);
         disconnect();
+    }
 
+    public void insertFastØvelse(String navn, int kilo, int sett, String type) throws SQLException {
+        connect();
+        PreparedStatement statement1 = conn.prepareStatement("INSERT into øvelse(navn, kilo, sett, type) values (?,?,?,?)");
+        statement1.setString(1, navn);
+        statement1.setInt(2, kilo);
+        statement1.setInt(3, sett);
+        statement1.setString(4, "apparat");
+        statement1.executeUpdate();
+        System.out.println("insert into øvelse values "+navn+", "+kilo+", "+sett+", "+type);
+        disconnect();
     }
 
     public void insertNotat(String treningsformål, String treningsopplevelse, int treningsøktID) throws SQLException {
@@ -63,16 +72,30 @@ public class ExecuteQueries extends DBConnect{
         preparedStatement.setString(1,treningsformål);
         preparedStatement.setString(2, treningsopplevelse);
         preparedStatement.setInt(3,treningsøktID);
+        preparedStatement.executeUpdate();
+        System.out.println("insert into notat(treningsformål, treningsopplevelse, treningsøktID) VALUES "+treningsformål+", "+treningsopplevelse+", "+treningsøktID);
     }
 
-    public ArrayList<String> getLastNtreningsøkt(String n)throws SQLException{
+    public void insertøvelseGrupper(String navn) throws SQLException {
         connect();
-        PreparedStatement preparedStatement = conn.prepareStatement("select dato, tidspunkt, varighet, informasjon, personlig_form, treningsformål, treningsopplevelse from treningsøkt\n" +
-                "left\n" +
-                "join notat on treningsøkt.id = notat.treningsøktID\n" +
-                "\n" +
-                "order by dato desc, tidspunkt desc limit ?");
-        preparedStatement.setString(1, "3");
+        PreparedStatement preparedStatement = conn.prepareStatement("insert into øvelsegruppe(navn) values ?");
+        preparedStatement.setString(1,navn);
+        preparedStatement.executeUpdate();
+    }
+
+    /**
+     *  GETTERS
+     */
+
+    public ResultSet getAllApparat() throws SQLException {
+        ResultSet rs = Select("SELECT * from apparat");
+        return rs;
+    }
+
+    public ArrayList<String> getLastNtreningsøkt(int n)throws SQLException{
+        connect();
+        PreparedStatement preparedStatement = conn.prepareStatement("select dato, tidspunkt, varighet, informasjon, personlig_form, treningsformål, treningsopplevelse from treningsøkt left join notat on treningsøkt.id = notat.treningsøktID order by dato desc, tidspunkt desc limit ?");
+        preparedStatement.setInt(1, n);
         preparedStatement.execute();
         ResultSet rs = preparedStatement.getResultSet();
         ArrayList<String> result = new ArrayList<String>();
@@ -165,5 +188,38 @@ public class ExecuteQueries extends DBConnect{
         }
         disconnect();
         return result;
+    }
+    public ResultSet getNLastTreningsØkterMedNotat() throws SQLException {
+        ResultSet rs = Select("select dato, tidspunkt, varighet, informasjon, personlig_form, treningsformål, treningsopplevelse from treningsøkt left join notat on treningsøkt.id = notat.treningsøktID order by dato desc, tidspunkt desc limit ?");
+        return rs;
+    }
+
+    public ResultSet øvelseResultatLogIInterval() throws SQLException {
+        ResultSet rs = Select("select informasjon from treningsøkt left join treningsøktutførerøvelse on treningsøkt.id = treningsøktutførerøvelse.treningsøktID left join øvelse on treningsøktutførerøvelse.øvelseID = øvelse.id where navn = ? and dato > ? and dato < ?");
+        return rs;
+    }
+
+    public ResultSet finneØvelserISammeGruppe() throws SQLException {
+        ResultSet rs = Select("select øvelse.navn from øvelsegruppe left join øvelseigruppe on øvelsegruppe.id = øvelseigruppe.gruppeid left join øvelse on øvelse.id = øvelseigruppe.øvelseid where øvelsegruppe.navn = ?");
+        return rs;
+    }
+
+    public ResultSet finneGjennomsnitt() throws SQLException{
+        ResultSet rs = Select("select avg(kilo) from øvelse left join treningsøktutførerøvelse on treningsøktutførerøvelse.øvelseID = øvelse.id left join treningsøkt on treningsøktutførerøvelse.treningsøktid = treningsøkt.id where dato > ? and dato < ?");
+        return rs;
+    }
+
+    public ResultSet Select(String Select) throws SQLException {
+        connect();
+        ResultSet rs = null;
+        try {
+            rs = conn.createStatement().executeQuery(Select);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        if(rs != null) {
+            return rs;
+        }
+        return null;
     }
 }
