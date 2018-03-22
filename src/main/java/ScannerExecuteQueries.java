@@ -19,7 +19,7 @@ public class ScannerExecuteQueries extends DBConnect{
         disconnect();
     }
 
-    public void insertTreningsøkt(int varighet, String informasjon, int personlig_form, int prestasjon) throws SQLException {
+    public void insertTreningsøkt(int varighet, String informasjon, int personlig_form, int prestasjon, boolean notat, String treningsformål, String treningsopplevelse, String øvelse) throws SQLException {
         connect();
         PreparedStatement statement1 = conn.prepareStatement("INSERT into treningsøkt(varighet, informasjon, personlig_form, prestasjon) VALUES (?,?,?,?) ");
         statement1.setInt(1, varighet);
@@ -28,10 +28,21 @@ public class ScannerExecuteQueries extends DBConnect{
         statement1.setInt(4,prestasjon);
         statement1.executeUpdate();
         System.out.println("insert into treningsøkt values "+varighet+", "+informasjon+", "+personlig_form+", "+prestasjon);
+
+        PreparedStatement statement3 = conn.prepareStatement("insert into treningsøktutførerøvelse values(last_insert_id(), (select id from øvelse where navn = ?))");
+        statement3.setString(1, øvelse);
+        statement3.executeUpdate();
+
+        if (notat) {
+            PreparedStatement statement2 = conn.prepareStatement("INSERT INTO notat(treningsformål, treningsopplevelse, treningsøktID) VALUES (?,?, LAST_INSERT_ID())");
+            statement2.setString(1, treningsformål);
+            statement2.setString(2, treningsopplevelse);
+            statement2.executeUpdate();
+        }
         disconnect();
     }
 
-    public void insertTreningMedNotat(int varighet, String informasjon, int personlig_form, int prestasjon, String treningsformål, String treningsopplevelse) throws SQLException{
+    /*public void insertTreningMedNotat(int varighet, String informasjon, int personlig_form, int prestasjon, String treningsformål, String treningsopplevelse) throws SQLException{
         connect();
         insertTreningsøkt(varighet,informasjon,personlig_form,prestasjon);
         ResultSet allTreningsøkt = conn.createStatement().executeQuery("SELECT FIRST from treningsøkt ORDER BY id DESC");
@@ -40,7 +51,7 @@ public class ScannerExecuteQueries extends DBConnect{
             id = allTreningsøkt.getInt("id");
         }
         insertNotat(treningsformål,treningsopplevelse, id);
-    }
+    }*/
 
     public void insertFriØvelse(String navn, String beskrivelse, String type) throws SQLException {
         connect();
@@ -53,7 +64,7 @@ public class ScannerExecuteQueries extends DBConnect{
         disconnect();
     }
 
-    public void insertFastØvelse(String navn, int kilo, int sett, String type) throws SQLException {
+    public void insertFastØvelse(String navn, int kilo, int sett, String type, String apparat) throws SQLException {
         connect();
         PreparedStatement statement1 = conn.prepareStatement("INSERT into øvelse(navn, kilo, sett, type) values (?,?,?,?)");
         statement1.setString(1, navn);
@@ -62,10 +73,13 @@ public class ScannerExecuteQueries extends DBConnect{
         statement1.setString(4, "apparat");
         statement1.executeUpdate();
         System.out.println("insert into øvelse values "+navn+", "+kilo+", "+sett+", "+type);
+        PreparedStatement statement2 = conn.prepareStatement("insert into apparatforøvelse values(LAST_INSERT_ID(), (select id from apparat where navn = ?))");
+        statement2.setString(1, apparat);
+        statement2.executeUpdate();
         disconnect();
     }
 
-    public void insertNotat(String treningsformål, String treningsopplevelse, int treningsøktID) throws SQLException {
+    /*public void insertNotat(String treningsformål, String treningsopplevelse, int treningsøktID) throws SQLException {
         connect();
         PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO notat(treningsformål, treningsopplevelse, treningsøktID) VALUES (?,?,?) ");
         preparedStatement.setString(1,treningsformål);
@@ -73,7 +87,7 @@ public class ScannerExecuteQueries extends DBConnect{
         preparedStatement.setInt(3,treningsøktID);
         preparedStatement.executeUpdate();
         System.out.println("insert into notat(treningsformål, treningsopplevelse, treningsøktID) VALUES "+treningsformål+", "+treningsopplevelse+", "+treningsøktID);
-    }
+    }*/
 
     public void insertØvelseGruppe(String navn) throws SQLException {
         connect();

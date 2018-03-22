@@ -45,7 +45,10 @@ public class ScannerMain {
                 System.out.print("Prestasjon: ");
                 int prestasjon = scanner.nextInt();
                 scanner.nextLine();
-                a.insertTreningsøkt(varighet, informasjon, form, prestasjon);
+                System.out.print("Øvelsenavn: ");
+                String øvelse = readLine(scanner);
+                scanner.nextLine();
+                a.insertTreningsøkt(varighet, informasjon, form, prestasjon, false, "", "", øvelse);
             }
             /**
              *  InsertØvelse
@@ -67,12 +70,16 @@ public class ScannerMain {
                     System.out.print("Sett: ");
                     int sett = scanner.nextInt();
                     scanner.nextLine();
-                    a.insertFastØvelse(navn, kilo, sett, type);
+                    System.out.print("Apparat navn: ");
+                    String apparat = readLine(scanner);
+                    scanner.nextLine();
+                    a.insertFastØvelse(navn, kilo, sett, type, apparat);
                 }
             }
             /**
              *  InsertNotat
              */
+            /*
             if (choice.equals("insertNotat")) {
                 System.out.print("Treningsformål: ");
                 String treningsformål = readLine(scanner);
@@ -82,7 +89,7 @@ public class ScannerMain {
                 int id = scanner.nextInt();
                 scanner.nextLine();
                 a.insertNotat(treningsformål, treningsopplevelse, id);
-            }
+            }*/
             /**
              *  InsertTreningMedNotat
              */
@@ -100,7 +107,10 @@ public class ScannerMain {
                 String treningsformål = readLine(scanner);
                 System.out.print("Treningsopplevelse: ");
                 String treningsopplevelse = readLine(scanner);
-                a.insertTreningMedNotat(varighet, informasjon, form, prestasjon, treningsformål, treningsopplevelse);
+                System.out.print("Øvelsenavn: ");
+                String øvelse = readLine(scanner);
+                scanner.nextLine();
+                a.insertTreningsøkt(varighet, informasjon, form, prestasjon, true, treningsformål, treningsopplevelse, øvelse);
             }
             /**
              *  InsertØvelseGruppe
